@@ -1,0 +1,284 @@
+made a very simple program that takes basic parameter from computer 
+and predict if computer is safe or not
+
+tommrrow:
+
+reseach about what data we need from computer to feed the model good and
+
+how to model it properly for accurate result
+
+================================================
+how to create a malware dataset of your own
+
+how can we make our own dataset from computer parameters like 
+(cpu usage, network up and down byte,disk usage, and other stuff) itself, for malware detection
+
+===============================================================================================
+
+khud se value zero krke train kro then fhir kro
+
+correct virus total 
+
+=====================================================================
+
+Reframe :  what if we deploy our model that runs on background and learn from all the process
+          running on computer , we learn their behaviour and train our model on that, and when
+          new process comes it can predict 
+          whether it is malware or not and also what percent chances that it can be a malware
+
+          for this we can see its hashcode and what it does and how it interect with computer
+          and many other things
+          lets make a gui application on python that gather information 24/7 and
+           when new process comes it will aleart if the chances of being the 
+           new process and malware is more than 75%
+
+
+Functionality Breakdown:
+
+Data Collection: The code collects information about running processes, including CPU usage, 
+                    memory usage, and number of threads, for two minutes.
+Model Training: It uses a Random Forest classifier to train a model to identify malicious processes 
+                based on the collected data. During training, it assumes all processes are legitimate.
+Malware Prediction: Once trained, the model predicts the likelihood of a process being malware 
+                    based on its resource usage.
+Monitoring: The application continuously monitors running processes and raises an alert 
+                if the model predicts a process with a high probability of being malware.
+GUI: The code uses the Tkinter library to create a user interface with a progress bar to show 
+        training progress, a label to display status messages, and a button to initiate training.
+
+===================================================================================================
+
+it fixed the issue but got the same old problem of getting new process with suspecion level in 
+the begenning, as i said so many times i want that in the end after data collection and model
+ traning then on the basis of that i want suspecion level and don;t notyfy me just give me 
+updateable dictionary where i can see all new process only not old one with their suspecion level
+
+Run the Program: Execute the Python script in your preferred environment.
+
+Start Process: Click the "Start Process" button. This will initiate the data collection process.
+
+Collecting Data: While the data is being collected, you will see the progress indicated by the progress bar and the label displaying "Collecting Data...". The button "Train Model" will be disabled during this stage.
+
+Training Model: After the data collection is complete, the program will automatically move to the model training stage. You will see the progress indicated by the progress bar and the label displaying "Training Model... Please wait." The button "Ready" will be disabled during this stage.
+
+Model Deployment: After the model training is complete, the program will automatically move to the model deployment stage. You will see the progress label change to "Model Deployed". At this point, the button "Ready" will become enabled.
+
+Monitoring Processes: While the model is deployed, the program will continuously monitor for new processes and their suspiciousness levels. If a new process is detected, a message box will pop up displaying the process name and its suspicion level.
+
+Repeat: The program will continue to monitor processes until you close the application.
+
+=============================================================
+
+we don't want to check already running programs we need to learn from them as train set , 
+all their parameters like their memory usage , cpu usage their interaction with system, 
+what permission they have, their network activity then  after our model is ready , 
+when new program come then we predict 
+
+till basic structure is ready, just focus on model
+==============================================================
+
+we made changes to model
+some more things need to iron out 
+
+we want to collect data of all existing process once , 
+train model on it and then using that model we want to predict all the new upcoming process 
+their suspecion percentage
+=============================================================================
+# TO be fixed
+
+-> we need to improve speed to data collection 
+
+-> it is getting stuck after data collection
+
+i want to make few changes in this 
+
+1) it is not necessay to take data for 60 sec it can take data as long as it want , 
+just give us ETA on screen  
+
+2) when data collection is done it should give us confirmation on screen that data collection is done 
+and  then we train our model on it 
+
+==============================================================================================
+see it can take as much time as possible to collect data in the begenning  
+but after data collection is done then that function of data collection should be fully stopped , 
+rn it tried collection data, then screen should show next stage with new bar
+in place of this bar of model traning with its own eta and then for model deployment,
+it should give us button, "REDAY to DEPLOY" and when user click that it should animate 
+like RADAR and monitors all the process and gives out its suspecion percentage in a list view 
+
+
+ok take data of maximum of 100 process and it can take as much time as possible , 
+but once it done it should be stopped permanently ,
+ right now thread of data collection is not handled properly, which hinders next stage
+
+=========================================================
+
+4 july
+
+ok data collection is smooth and transiton is also very good but ,
+we have issue in training model, only use random forest classifier , 
+and why are we using dummy data, use the same data that we just collected and ,
+after model training , deploy buttom will be given to user and when use press that, 
+radar like animation should some on screen and whenever new process comes, 
+it should put in the model and classify as threat or not with percentage
+
+
+
+
+code ran smoothly tho, but there are some issue
+radar animation not working and after deployment when i open new process like notepad and notepad++,
+it didn't even detect that i opened new process,
+Let me repeat myself very clear after deployment when new process starts on operating system 
+i want it to detect and tell IS IT A THREAT or NOT with how much percentage of accuracy
+
+
+
+
+till here code is good, but it is giving error in deployment stage
+   probability = model.predict_proba([process_info])[0][1] * 100  # Probability of being a threat
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: index 1 is out of bounds for axis 0 with size 1
+
+why can;t we fix this error
+
+=======================================================================================
+
+6 july 
+it is working !!
+but more work and fine tuning is needed
+
+
+bro don;t change the code structure , current gui is awesome i am just asking you to just 
+and don;t start showing processes when code ran , you can collect data and train model
+as directed but you cannot deploy without me pressing the button
+add a list box where all the process that you have checked can be seen with their respective pid name and percentage and threat or not
+
+secondly just remove all the print statement
+
+
+==================================================
+6th july 
+code is in best shape ever 
+
+
+changes i want you to make
+1)  take info of 100 process from computer and label them as non threat, and another 100 from synthetic data and label them as threat , 
+2) in the csv file everything should be properly labeled and only 200 data should be there
+
+rest training and everything is good , don't  make changes there 
+
+==========================================================
+
+so structure is fine now we move on to next thing,
+while monitoring in deployment phase keep rechecking all the process all the time , 
+and the moment they behave diffrentently than normal we call them as threat
+
+for example  if some program suddenly taking more read write or memory or cpu 
+then i should be flagged as threat , 
+even if it was behaving normally before but after every interval 
+keep cheaking everything again and again and keep adding 
+new process or keep appending old process with new values and keep training the model
+
+
+
+font of list box display should be bigger and when it is no threat 
+it should be in green and when it is threat it should be in red and 
+when we get threat it should be copied to diffrent file where user can see later 
+
+secondly when we monitor process we need to keep in mind about 
+the rate of change of behavior for example if a process is using 5% of read wirte or memory or anything 
+and suddlenly it starts using 50% then rate of change is 1000% it should be flagged 
+check all the process every 5 sec continously for any rate of change that is abnormal and do as i said
+==============================================================================================
+
+so to make things clear we lets discuss the flow of program
+first we take data of 100 process from computer  and label them as non threat
+then we will generate 100 synthetic data and label them as threat
+then we will train model on it 
+either random forest or gradient boosting whichever gives better accuracy
+then once user press deploy
+then it will keep appending the process file with new values and if new process comes it will also append that and its attribute and show either its threat or not
+process after deployment it should keep appending new values and keep tranining model on it and keep checking if it is threat or not should continue till user press stop buttom
+
+1)some visual issue that is with right now is while data collection animation of 100 data collection is not smooth , it just happen suddlenly from 0-100
+2) once deploy buttom is hit i only want new process on the gui list with green color as non-threat and red color if threat, not all the prcoess 
+
+ ================================================================
+
+This is where we are rn
+
+Data Collection and Preparation: 
+The program begins by collecting data from the current system processes. 
+It collects information about 50 real processes, labeling them as non-threats, 
+and generates 100 synthetic processes labeled as threats. 
+This data is then combined and saved to a CSV file named process_data.csv. 
+The features include CPU and memory usage, read and write counts, thread count, 
+and the number of open files.
+
+Model Training: After data collection, the program trains a neural network model using the combined dataset.
+ It splits the data into training and test sets, scales the features using StandardScaler, 
+ and converts labels into categorical format. 
+ The neural network model is built with a specific architecture, compiled, 
+ and trained over 50 epochs. The trained model is saved to a file named neural_network_model.h5, 
+ and the scaler is saved to scaler.pkl.
+
+User Interface Setup: A GUI is created using Tkinter, 
+which includes a list box for displaying monitored process information, 
+a progress bar and label for tracking training progress, 
+and buttons for deploying and stopping the monitoring process.
+The GUI also has a scrollbar for navigating the list of monitored processes.
+
+Process Monitoring: Once the model is trained, the "Deploy" button is enabled, 
+allowing the user to start monitoring system processes. In the monitoring phase,
+the program continuously checks running processes, 
+predicting their threat status using the trained model. 
+It displays each process's PID, name, status (threat or non-threat), 
+and the probability of being a threat in the list box. 
+Processes are colored red if flagged as threats and green if non-threats.
+
+Threat Management: When a process is identified as a threat (probability > 50%), 
+it is logged and saved to a CSV file named flagged_threats.csv. 
+This allows for a record of flagged threats to be reviewed later. 
+The monitoring continues at 5-second intervals until the "Stop" button is pressed, 
+at which point the monitoring ceases, and a message is displayed indicating the stop.
+
+===============================================
+
+1 aug
+
+it is kinda in shape but have to implement 2 more things to improve detection
+
+1 > Threshold-Based Detection: The ProcessMonitor class relies on pre-defined thresholds for CPU, 
+memory, and I/O usage to identify threats. These thresholds are static and may not be 
+effective in all cases. Synthetic threats might operate below these thresholds, evading detection.
+
+2 > Limited Monitoring: The code in ProcessMonitor only monitors CPU usage, memory usage, 
+read/write counts, number of threads, and open files. It doesn't capture details 
+like sudden spikes in CPU/memory consumption or frequent disk access patterns, 
+which could be indicative of malicious activity.
+
+
+to enhance this we will 
+
+1. Threshold-Based Detection Improvement
+Instead of using static thresholds, you can use adaptive thresholds or dynamic detection mechanisms. Here are some approaches:
+
+Statistical Thresholds: Calculate thresholds based on statistical measures (e.g., mean and standard deviation) from historical data. This allows the system to adapt to normal variations in system behavior.
+
+Percentile-Based Thresholds: Use percentiles (e.g., 95th percentile) of historical data to set dynamic thresholds. This way, thresholds are set based on the distribution of process behaviors.
+
+Machine Learning-Based Anomaly Detection: Implement an anomaly detection algorithm that learns from historical data and identifies deviations from normal behavior. Techniques such as Isolation Forest or One-Class SVM can be useful.
+
+2. Enhanced Monitoring
+To capture more detailed behaviors indicative of malicious activity:
+
+Monitor Sudden Spikes: Track changes in CPU and memory usage over time to detect sudden spikes. Use a moving average or rolling window approach to analyze trends and detect anomalies.
+
+Frequent Disk Access: Record disk read/write patterns and flag processes with unusual access frequencies or patterns. You could use a time-series approach to analyze these patterns.
+
+Behavioral Profiles: Create profiles of normal behavior for each process. Compare current behavior against these profiles to detect deviations that may indicate malicious activity.
+
+
+
+
+
