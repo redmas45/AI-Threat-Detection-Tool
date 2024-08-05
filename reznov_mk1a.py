@@ -71,10 +71,10 @@ class ProcessMonitor:
             process_info = [
                 random.uniform(50, 100),  # High CPU usage
                 random.uniform(50, 100),  # High memory usage
-                random.randint(1000, 5000),  # High read count
-                random.randint(1000, 5000),  # High write count
+                random.randint(500, 5000),  # High read count
+                random.randint(500, 5000),  # High write count
                 random.randint(2, 200),  # High number of threads
-                random.randint(10, 1000)  # High number of open files
+                random.randint(5, 100)  # High number of open files
             ]
             process_info.append(1)  # Label 1 for threat
             threat_data.append(process_info)
@@ -151,7 +151,7 @@ class ProcessMonitor:
 
         # Train the model
         logging.info("Training the neural network model.")
-        model.fit(X_train_scaled, y_train_cat, epochs=50, batch_size=10, verbose=1)
+        model.fit(X_train_scaled, y_train_cat, epochs=1000, batch_size=10, verbose=2)
 
         # Evaluate the model
         accuracy = model.evaluate(X_test_scaled, y_test_cat, verbose=0)[1]
