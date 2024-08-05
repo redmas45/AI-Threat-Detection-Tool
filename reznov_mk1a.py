@@ -41,7 +41,7 @@ class ProcessMonitor:
         self.observed_behaviors = []  # List to store recent behaviors for analysis
         self.synthetic_threat_data = []  # Adaptive threat data storage
         self.history = {'cpu_percent': [], 'memory_percent': [], 'read_count': [], 'write_count': [], 'num_threads': [], 'open_files': []}
-        self.percentile_threshold = 95  # Percentile for dynamic thresholding
+        self.percentile_threshold = 50  # Percentile for dynamic thresholding
 
     def collect_non_threat_data(self, num_processes=50):
         """Collects non-threat data from current system processes."""
@@ -73,8 +73,8 @@ class ProcessMonitor:
                 random.uniform(50, 100),  # High memory usage
                 random.randint(1000, 5000),  # High read count
                 random.randint(1000, 5000),  # High write count
-                random.randint(50, 200),  # High number of threads
-                random.randint(100, 500)  # High number of open files
+                random.randint(2, 200),  # High number of threads
+                random.randint(10, 1000)  # High number of open files
             ]
             process_info.append(1)  # Label 1 for threat
             threat_data.append(process_info)
