@@ -279,6 +279,22 @@ Frequent Disk Access: Record disk read/write patterns and flag processes with un
 Behavioral Profiles: Create profiles of normal behavior for each process. Compare current behavior against these profiles to detect deviations that may indicate malicious activity.
 
 
+===========================================================================
+24 august
+
+gui looks even bad as if now
+
+now on changes
+Enhance the realism of synthetic data by incorporating more complex patterns like random spikes or simulating specific malware behaviors.
+Automate labeling and data balancing to handle real-world imbalanced datasets better.
+or import some threat library that  , will help model to train on real life threats
+
+Use cross-validation for more robust model training.
+Implement hyperparameter tuning to find the best model architecture.
+Add more advanced visualization widgets like charts or graphs to show real-time stats.
+
+
+
 
 
 
