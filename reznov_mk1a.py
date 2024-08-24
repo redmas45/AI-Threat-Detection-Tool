@@ -13,35 +13,35 @@ import warnings
 import os
 import logging
 
-# For neural network
+
 from keras.models import Sequential, load_model
 from keras.layers import Dense
 from keras.utils import to_categorical
 import tensorflow as tf
 
-# Suppress UserWarning for feature names
+
 warnings.filterwarnings("ignore", category=UserWarning)
 
-# Global variables
+
 observed_pids = set()
-flagged_pids = set()  # Track flagged PIDs separately for re-evaluation
-stop_monitoring = False  # Control flag for stopping the monitoring
+flagged_pids = set()  
+stop_monitoring = False  
 data_file = 'flagged_threats.csv'
-monitoring_interval = 5  # seconds
+monitoring_interval = 5  
 model_file = 'neural_network_model.h5'
 scaler_file = 'scaler.pkl'
 
-# Configure logging
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class ProcessMonitor:
     def __init__(self, root, listbox):
         self.root = root
         self.listbox = listbox
-        self.observed_behaviors = []  # List to store recent behaviors for analysis
-        self.synthetic_threat_data = []  # Adaptive threat data storage
+        self.observed_behaviors = []  
+        self.synthetic_threat_data = []  
         self.history = {'cpu_percent': [], 'memory_percent': [], 'read_count': [], 'write_count': [], 'num_threads': [], 'open_files': []}
-        self.percentile_threshold = 50  # Percentile for dynamic thresholding
+        self.percentile_threshold = 50  
 
     def collect_non_threat_data(self, num_processes=50):
         """Collects non-threat data from current system processes."""
@@ -54,7 +54,7 @@ class ProcessMonitor:
             try:
                 process = psutil.Process(pid)
                 process_info = self.get_process_info(process)
-                process_info.append(0)  # Label 0 for non-threat
+                process_info.append(0)  
                 non_threat_data.append(process_info)
                 count += 1
                 if count >= num_processes:
@@ -63,20 +63,20 @@ class ProcessMonitor:
                 continue
         return non_threat_data
 
-    def create_synthetic_threat_data(self, num_samples=100):
+    def create_synthetic_threat_data(self, num_samples=1000):
         """Generates synthetic threat data."""
         logging.info(f"Generating synthetic threat data for {num_samples} samples.")
         threat_data = []
         for _ in range(num_samples):
             process_info = [
-                random.uniform(50, 100),  # High CPU usage
-                random.uniform(50, 100),  # High memory usage
-                random.randint(500, 5000),  # High read count
-                random.randint(500, 5000),  # High write count
-                random.randint(2, 200),  # High number of threads
-                random.randint(5, 100)  # High number of open files
+                random.uniform(50, 100),
+                random.uniform(50, 100),  
+                random.randint(500, 5000),  
+                random.randint(500, 5000),  
+                random.randint(2, 200),  
+                random.randint(5, 100)  
             ]
-            process_info.append(1)  # Label 1 for threat
+            process_info.append(1)  
             threat_data.append(process_info)
         return threat_data
 
@@ -125,39 +125,39 @@ class ProcessMonitor:
         X = collected_data.drop('label', axis=1)
         y = collected_data['label']
 
-        # Split data into training and test sets
+        
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100)
 
-        # Scale features
+        
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
 
-        # Save the scaler for future use
+
         joblib.dump(scaler, scaler_file)
 
-        # Convert labels to categorical
+        
         y_train_cat = to_categorical(y_train, num_classes=2)
         y_test_cat = to_categorical(y_test, num_classes=2)
 
-        # Build the neural network model
+        
         model = Sequential()
         model.add(Dense(1024, input_dim=X_train.shape[1], activation='relu'))
         model.add(Dense(256, activation='relu'))
-        model.add(Dense(2, activation='softmax'))  # 2 classes: non-threat and threat
+        model.add(Dense(2, activation='softmax'))  
 
-        # Compile the model
+        
         model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-        # Train the model
+        
         logging.info("Training the neural network model.")
         model.fit(X_train_scaled, y_train_cat, epochs=1000, batch_size=10, verbose=2)
 
-        # Evaluate the model
+        
         accuracy = model.evaluate(X_test_scaled, y_test_cat, verbose=0)[1]
         logging.info(f"Model accuracy: {accuracy * 100:.2f}%")
 
-        # Save the model
+        
         model.save(model_file)
         logging.info(f"Model saved to {model_file}.")
 
@@ -182,7 +182,7 @@ class ProcessMonitor:
         """Monitors system processes for potential threats."""
         global observed_pids, stop_monitoring, flagged_pids
 
-        # Check if model and scaler files exist
+        
         if not os.path.exists(model_file):
             logging.error(f"Model file {model_file} not found. Ensure the model is trained and saved correctly.")
             messagebox.showerror("Error", f"Model file {model_file} not found.")
@@ -206,7 +206,7 @@ class ProcessMonitor:
             messagebox.showerror("Error", f"Error loading model or scaler: {e}")
             return
 
-        while not stop_monitoring:  # Continuously monitor unless stopped
+        while not stop_monitoring:  
             for pid in psutil.pids():
                 if pid == 4 or pid in observed_pids or pid in flagged_pids:
                     continue
@@ -216,47 +216,47 @@ class ProcessMonitor:
 
                     process_info = self.get_process_info(process)
                     
-                    # Update history for dynamic thresholds
+                    
                     for i, key in enumerate(['cpu_percent', 'memory_percent', 'read_count', 'write_count', 'num_threads', 'open_files']):
                         self.history[key].append(process_info[i])
 
-                    # Predict and calculate probabilities
+                    
                     process_info_scaled = scaler.transform([process_info])
                     prediction = model.predict(process_info_scaled)
                     prediction_class = prediction.argmax(axis=-1)[0]
                     probability = prediction[0][prediction_class] * 100
 
-                    # Determine if thresholds should be updated
+                    
                     thresholds = self.dynamic_thresholds()
                     
-                    # Check if the process exceeds dynamic thresholds
+                    
                     abnormal = False
                     for i, key in enumerate(['cpu_percent', 'memory_percent', 'read_count', 'write_count', 'num_threads', 'open_files']):
                         if thresholds.get(key) and (process_info[i] > thresholds[key]['high']):
                             abnormal = True
                             break
                     
-                    # Identify threats based on prediction class
-                    if prediction_class == 1 or abnormal:  # Threat detected or abnormal behavior
+                    
+                    if prediction_class == 1 or abnormal:  
                         threat_status = "Threat"
                         color = "red"
-                        flagged_pids.add(pid)  # Add to flagged list
+                        flagged_pids.add(pid)  
 
-                        # Save flagged threat information to a file
+            
                         self.save_flagged_threat(process_info, process_name, probability)
                     else:
                         threat_status = "No Threat"
                         color = "green"
 
-                    # Update the GUI with the process information
+                    
                     self.update_gui(pid, process_name, threat_status, probability, color)
 
-                    # Add the PID to the observed list
+                    
                     observed_pids.add(pid)
                 except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                     continue
 
-            # Sleep for a specified interval before checking again
+            
             time.sleep(monitoring_interval)
 
     def save_flagged_threat(self, process_info, process_name, probability):
@@ -293,7 +293,7 @@ def create_gui():
     root = tk.Tk()
     root.title("Malware Detection System")
 
-    # Configure GUI layout
+    
     frame = tk.Frame(root)
     frame.pack(padx=10, pady=10)
 
@@ -303,7 +303,7 @@ def create_gui():
     progress_bar = ttk.Progressbar(frame, length=300, mode='determinate')
     progress_bar.pack(pady=5)
 
-    # Listbox with scrollbars
+    
     listbox_frame = tk.Frame(frame)
     listbox_frame.pack(pady=10)
 
