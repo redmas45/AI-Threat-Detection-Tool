@@ -293,6 +293,17 @@ Use cross-validation for more robust model training.
 Implement hyperparameter tuning to find the best model architecture.
 Add more advanced visualization widgets like charts or graphs to show real-time stats.
 
+===================================================================================
+
+27 aug
+
+-gonna implement cross validation
+-dynamic data collection
+-gonna add hyperparameter like gridsearch
+-gonna add regularization so that model does not overfit
+
+======================================================================
+
 
 
 
