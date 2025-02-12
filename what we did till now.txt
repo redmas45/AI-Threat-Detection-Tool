@@ -304,6 +304,61 @@ Add more advanced visualization widgets like charts or graphs to show real-time 
 
 ======================================================================
 
+12 FEB 2025
+
+lets rethink about everything
+
+whole approch from the beginning
+
+am i right to collect data from pc itself?
+
+am i right to create static random data and mix with pc data
+
+how does it is influencing my detection
+
+what else approach i can have
+
+what else i can do tackle real life threats 
+
+it should use less resource for maximum result 
+======================================================================
+In this version, we collect 12 numeric features for each process:
+
+CPU usage (%)
+Memory usage (%)
+Number of threads
+Number of open files
+Number of network connections
+Read bytes (from I/O counters)
+Write bytes (from I/O counters)
+Read count (from I/O counters)
+Write count (from I/O counters)
+RSS (resident memory)
+VMS (virtual memory)
+Digital signature validity (binary: 1 if signature exists [or on non‑Windows, default 1], else 0)
+===========================================================
+Below is an enhanced version of your rez.py file. In this revision, I’ve added a few improvements:
+
+• A deeper behavioral analysis by maintaining a short-term history of CPU usage per process. If a process’s CPU usage deviates significantly from its recent average, extra risk points are added.
+
+• Real‐time threat intelligence integration for both processes and network connections. When a suspicious process is detected, the code computes a SHA256 hash of its executable and “queries” an external threat intel API (here simulated with a dummy URL). Likewise, for remote IP addresses, the system queries a threat intel service whilAe caching results to avoid repeated lookups.
+
+• More robust error handling is introduced across file operations, process detail collection, YARA rule loading/scanning, and threat intel queries. In addition, a ThreadPoolExecutor offloads threat intelligence lookups to avoid blocking the main monitoring loops.
+
+• Some performance optimizations include caching CPU histories and using oneshot() for process attribute collection.
+
+------------------
+This hybrid approach (behavioral analysis plus signature matching) is common in modern threat detection systems.
+
+In a real-world deployment, you would continuously collect data on processes and update your model with new examples, including known malicious samples from threat intelligence feeds.
+• With a feedback loop, you can incorporate new virus signatures and behavioral data into your training dataset so that your model evolves over time and improves its detection accuracy.
+------------
+
+Adding a data logging module.
+Choosing a persistent storage solution.
+Scheduling periodic training.
+Handling safe model updates.
+
 
 
 
